@@ -1,9 +1,11 @@
 package application;
 
 
+import java.awt.event.ActionEvent;
 import java.util.Random;
 
 import application.TicTacToe.Cell;
+import javafx.scene.image.ImageView;
 
 public class Player {
 	
@@ -12,19 +14,51 @@ public class Player {
 	private String hardnessLevel; // if it is a computer, what level of hardness will he play at 
 	private Cell[][] boardState; // holds the current state of the board for the computer to use if necessary
 	private int numberOfMovesLeft = 9;
+	protected Global global;
 	
-	public Player (String token, boolean isComputer) {
+	public Player (Global global,String token, boolean isComputer) {
+		this.global = global;
 		this.token = token;
 		this.isComputer = isComputer;
 		this.hardnessLevel = "easy";
 	}
 	
-	public Player (String token, boolean isComputer, String hardnessLevel) {
-		this.token = token;
-		this.isComputer = isComputer;
-		this.hardnessLevel = hardnessLevel.toLowerCase();
-	};
+	public int[] computerMove() {
+		int[] choice = {0,0}; //x and y coordinates for the computer's move
+		switch(hardnessLevel) {
+		case "easy":
+			return easyPlay();
+		case "medium":
+			break;
+		case "hard":
+			break;
+		}
+		
+		return choice;
+	}
+	
+	public int[] easyPlay() {
+		int[] choice = {0,0};
+		Random random = new Random();
+		int computerMove = random.nextInt(numberOfMovesLeft);
+		int count = 0;
+		for (int x = 0; x < 3; x++)
+			for (int y = 0; y < 3; y++) {
+				if (boardState[x][y].getToken().equals(" ")){
+					if (count == computerMove ) {
+						choice[0] = x;
+						choice[1] = y;
+						return choice;
+					} else
+						count++;
+				}
+			}
+		return choice;
+		
+	}
 
+/*--------------------------Getters / Setters and their helper methods   ---------------------------*/
+	
 	/**
 	 * @return the token
 	 */
@@ -80,41 +114,5 @@ public class Player {
 	public void setNumberOfMovesLeft(int numberOfMovesLeft) {
 		this.numberOfMovesLeft = numberOfMovesLeft;
 	}
-	
-	public int[] computerMove() {
-		int[] choice = {0,0}; //x and y coordinates for the computer's move
-		switch(hardnessLevel) {
-		case "easy":
-			return easyPlay();
-		case "medium":
-			break;
-		case "hard":
-			break;
-		}
-		
-		return choice;
-	}
-	
-	public int[] easyPlay() {
-		int[] choice = {0,0};
-		Cell[][] tempBoardCells = boardState;
-		Random random = new Random();
-		int computerMove = random.nextInt(numberOfMovesLeft);
-		int count = 0;
-		for (int x = 0; x < 3; x++)
-			for (int y = 0; y < 3; y++) {
-				if (boardState[x][y].getToken().equals(" ")){
-					if (count == computerMove ) {
-						choice[0] = x;
-						choice[1] = y;
-						return choice;
-					} else
-						count++;
-				}
-			}
-		return choice;
-		
-	}
-
 
 }
