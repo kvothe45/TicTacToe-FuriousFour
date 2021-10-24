@@ -2,6 +2,7 @@ package application;
 
 import java.util.Random;
 import application.TicTacToe.Cell;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.layout.VBox;
 
 public class Player extends VBox {
@@ -22,12 +23,14 @@ public class Player extends VBox {
 	public int[] computerMove() {
 		int[] choice = {0,0}; //x and y coordinates for the computer's move
 		switch(hardnessLevel) {
-		case "easy":
-			return easyPlay();
-		case "medium":
-			break;
-		case "hard":
-			break;
+			case "easy":
+				choice = easyPlay();
+				break;
+			case "medium":
+				choice = mediumPlay();
+				break;
+			case "hard":
+				break;
 		}
 		
 		return choice;
@@ -51,6 +54,13 @@ public class Player extends VBox {
 			}
 		return choice;
 		
+	}
+	
+	public int[] mediumPlay() {
+		for (Combinations combinations: global.getWinningCombinations())
+			if (combinations.consecutiveCellsFilled()[0] != 3)
+				return combinations.consecutiveCellsFilled();
+		return easyPlay();
 	}
 
 /*--------------------------Getters / Setters and their helper methods   ---------------------------*/
