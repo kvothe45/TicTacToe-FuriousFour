@@ -1,12 +1,14 @@
 package application;
 
+
+import java.util.ArrayList;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
@@ -25,27 +27,17 @@ import javafx.stage.Stage;
 
 public class TicTacToe extends Application {
 	
-	private String whoseTurn = "Player 1"; //Indicate which player has a turn, initially it is the X player
 	private Cell[][] board = new Cell[3][3]; // Create and initialize cell
-	private Label gameStatus = new Label("Player 1's turn to play"); //Create and initialize a status label
-	private boolean isPlayable = true; //Create a boolean to see if we can still play the game or it's over
-	private ImageView backgroundImageView = new ImageView(); // holds the selected background
-	private ImageView player1AvatarImageView = new ImageView(); // link to the avatar ImageView object for player1
-	private ImageView player2AvatarImageView = new ImageView(); // link to the avatar ImageView object for player2
 	private PlayerPane player1, player2; // sets up the two player objects
-	private int numberOfMovesLeft = 9; // keeps track of the number of moves left for the random generator
-	HBox difficultyLevelRadioBox; // sets this box globally so the visibility can be changed depending on whether it's an all human game or not
-	private Global global = new Global();
-	HBox numberOfPlayersRadioBox = new HBox();
+	private Global global = new Global(); // class to store global items for this view
+	private ArrayList<Combinations> winningCombinations = new ArrayList<>(); 
 	
 
 	@Override // Override the start method in the Application class
 	public void start(Stage primaryStage) throws Exception {		
 		
 		player1 = new PlayerPane(global, "X", false);
-		//player1.setAvatarImageView(player1AvatarImageView);
 		player2 = new PlayerPane(global, "O", false);
-		//player2.setAvatarImageView(player2AvatarImageView);
 		StackPane visibleLayers = createGameLayers(); // This has all the visible layers for the game
 		Scene scene = new Scene(visibleLayers, 1025, 740); //Create a scene and place it in the stage
 		
@@ -66,7 +58,7 @@ public class TicTacToe extends Application {
 		BorderPane gamePane = createGamePane(); // this is the layer with all the game actions in it
 		StackPane gameLayers = new StackPane(); // this is the pane that holds the background image first then all the other layers on top
 		
-		gameLayers.getChildren().addAll(backgroundImageView , gamePane);
+		gameLayers.getChildren().addAll(global.getBackgroundImageView(), gamePane);
 		
 		return gameLayers;
 	}
@@ -95,20 +87,22 @@ public class TicTacToe extends Application {
 		// creates and populates the left border pane
 		StackPane leftPane = new StackPane();  // this pane will be for player 1
 		//Rectangle leftRectangle = rectangleCreator(225, 600); // this rectangle will define the area
-		leftPane.getChildren().addAll(player1.createSidePane());
+		//player1.createSidePane();
+		leftPane.getChildren().addAll(player1);
 		gamePane.setLeft(leftPane);
 		
 		//creates and populates the right border pane
 		StackPane rightPane  = new StackPane(); // this pane will be for player 2
 		//Rectangle rightRectangle = rectangleCreator(225, 600); // this rectangle will define the area
-		rightPane.getChildren().add(player2.createSidePane());
+		//player2.createSidePane();
+		rightPane.getChildren().add(player2);
 		gamePane.setRight(rightPane);
 		
 		// creates and populates the bottom border pane
-		gameStatus.setFont(Font.font(24));
+		global.getGameStatus().setFont(Font.font(24));
 		StackPane bottomStackPane = new StackPane();
-		bottomStackPane.getChildren().add(gameStatus);
-		StackPane.setAlignment(gameStatus, Pos.CENTER);
+		bottomStackPane.getChildren().add(global.getGameStatus());
+		StackPane.setAlignment(global.getGameStatus(), Pos.CENTER);
 		gamePane.setBottom(bottomStackPane);
 		
 		
@@ -126,13 +120,12 @@ public class TicTacToe extends Application {
 		HBox menuRow1HBox = new HBox();
 
 		HBox backgroundChoiceBox = createBackgroundChoiceBox();
-
-		numberOfPlayersRadioBox = createNumberOfPlayersSelection();
-		difficultyLevelRadioBox = createDifficultySelectionBox();
-		difficultyLevelRadioBox.setVisible(false);
+		global.setNumberOfPlayersRadioBox(createNumberOfPlayersSelection());
+		global.setDifficultyLevelRadioBox(createDifficultySelectionBox());
+		global.getDifficultyLevelRadioBox().setVisible(false);
 		
-		menuRow1HBox.getChildren().addAll(backgroundChoiceBox, numberOfPlayersRadioBox, 
-				difficultyLevelRadioBox);
+		menuRow1HBox.getChildren().addAll(backgroundChoiceBox, global.getNumberOfPlayersRadioBox(), 
+				global.getDifficultyLevelRadioBox());
 		menuRowsVBox .getChildren().addAll(menuRow1HBox);
 		
 		return menuRowsVBox;
@@ -200,7 +193,7 @@ public class TicTacToe extends Application {
 			default: fileString = "file:.\\resources\\white.png";
 		}
 		Image backgroundImage = new Image(fileString, 1100, 740, false, true);
-		backgroundImageView.setImage(backgroundImage);
+		global.getBackgroundImageView().setImage(backgroundImage);
 	}
 	
 	/**
@@ -228,29 +221,42 @@ public class TicTacToe extends Application {
 		
 		noHumans.setOnAction(e -> {
 			clearBoard();
-			player1 = new PlayerPane(global, "X", true);
-			player2 = new PlayerPane(global, "O", true);
-			numberOfMovesLeft = 9;
-			player1.setNumberOfMovesLeft(numberOfMovesLeft);
-			player2.setNumberOfMovesLeft(numberOfMovesLeft);
+			boolean isComputer = player2.isComputer();
+			String tempString = player2.getHardnessLevel();
+			if (player2.isComputer()) {
+				player1.setHardnessLevel(player2.getHardnessLevel());
+				player1.setComputer(true);
+			}
+			else {
+				player1.setHardnessLevel("easy");
+				player2.setHardnessLevel("easy");
+				player1.setComputer(true);
+				player2.setComputer(true);
+			}
+			global.setNumberOfMovesLeft(9);
 			checkNextPlayer();
-			difficultyLevelRadioBox.setVisible(true);
+			global.getDifficultyLevelRadioBox().setVisible(true);
+				
 		}); 
 		oneHuman.setOnAction(e -> {
 			clearBoard();
-			player1 = new PlayerPane(global, "X", false);
-			player2 = new PlayerPane(global, "O", true);
-			numberOfMovesLeft = 9;
-			player2.setNumberOfMovesLeft(numberOfMovesLeft);
-			difficultyLevelRadioBox.setVisible(true);
-			player2.setHardnessLevel("easy");
+			if (player2.isComputer()) {
+				player2.setHardnessLevel(player2.getHardnessLevel());
+				player1.setComputer(false);
+			} else {
+				player2.setHardnessLevel("easy");
+				player2.setComputer(true);
+			}
+			global.setNumberOfMovesLeft(9);
+			global.getDifficultyLevelRadioBox().setVisible(true);
+			
 		});
 		twoHumans.setOnAction(e -> {
 			clearBoard();
-			player1 = new PlayerPane(global, "X", false);
-			player2 = new PlayerPane(global, "O", false);
-			numberOfMovesLeft = 9;
-			difficultyLevelRadioBox.setVisible(false);
+			player1.setComputer(false);
+			player2.setComputer(false);
+			global.setNumberOfMovesLeft(9);
+			global.getDifficultyLevelRadioBox().setVisible(false);
 		});
 		
 		Text numberOfPlayersText = new Text("Number of Players: ");
@@ -283,27 +289,21 @@ public class TicTacToe extends Application {
 		easyButton.setOnAction(e -> {
 			updateHardnessLevel(easyButton.getText());
 			clearBoard();
-			numberOfMovesLeft = 9;
-			player1.setNumberOfMovesLeft(numberOfMovesLeft);
-			player2.setNumberOfMovesLeft(numberOfMovesLeft);
+			global.setNumberOfMovesLeft(9);
 			if (player1.isComputer())
 				checkNextPlayer();			
 		});
 		mediumButton.setOnAction(e -> {
 			updateHardnessLevel(mediumButton.getText());
 			clearBoard();
-			numberOfMovesLeft = 9;
-			player1.setNumberOfMovesLeft(numberOfMovesLeft);
-			player2.setNumberOfMovesLeft(numberOfMovesLeft);
+			global.setNumberOfMovesLeft(9);
 			if (player1.isComputer())
 				checkNextPlayer();			
 		});
 		hardButton.setOnAction(e -> {
 			updateHardnessLevel(hardButton.getText());
 			clearBoard();
-			numberOfMovesLeft = 9;
-			player1.setNumberOfMovesLeft(numberOfMovesLeft);
-			player2.setNumberOfMovesLeft(numberOfMovesLeft);
+			global.setNumberOfMovesLeft(9);
 			if (player1.isComputer())
 				checkNextPlayer();			
 		});
@@ -339,7 +339,23 @@ public class TicTacToe extends Application {
 		for (int x = 0; x < 3; x++)
 			for(int y = 0; y < 3; y++)
 				boardPane.add(board[x][y] = new Cell(), y, x);
+		createWinningCombinations();
 		return boardPane;
+	}
+	
+	/**
+	 * method to fill all winning combinations in an ArrayList
+	 */
+	private void createWinningCombinations() {
+		//horizontal winning combinations
+		for (int x = 0; x < 3; x++)
+			winningCombinations.add(new Combinations(global, board[x][0], board[x][1], board[x][2]));
+		// vertical winning combinations
+		for (int y = 0; y < 3; y++)
+			winningCombinations.add(new Combinations(global, board[0][y], board[1][y], board[2][y]));
+		// diagonal winning combinations
+		winningCombinations.add(new Combinations(global, board[0][0], board[1][1], board[2][2]));
+		winningCombinations.add(new Combinations(global, board[0][2], board[1][1], board[2][0]));		
 	}
 
 	/**
@@ -361,8 +377,8 @@ public class TicTacToe extends Application {
 		for (int x = 0; x < 3; x++)
 			for(int y = 0; y < 3; y++)
 				board[x][y].setToken(" ");
-		isPlayable = true;
-		whoseTurn = "Player 1";
+		global.setPlayable(true);
+		global.setWhoseTurn("Player 1");
 	}
 	
 	/**
@@ -381,37 +397,34 @@ public class TicTacToe extends Application {
 	 * Determine if the player with the specified token wins
 	 * @param args
 	 */
-	public boolean isWon(String whoseTurn) {
-		
-		String token;
-		if (whoseTurn.equals("Player 1"))
-			token = player1.getToken();
-		else
-			token = player2.getToken();
-		
-		// check all rows
-		for (int x = 0; x < 3; x++) 
-			if (board[x][0].getToken().equals(token)
-					&& board[x][1].getToken().equals(token)
-					&& board[x][2].getToken().equals(token))
+	public boolean isWon() {
+		for (Combinations winningCombo: winningCombinations) {
+			if (winningCombo.isGameWon()) {
+				if (global.getWhoseTurn().equals("Player 1")) {
+					if (!player1.isComputer())
+						player1.setHumanWins(player1.getHumanWins() + 1);
+					else
+						player1.setComputerWins(player1.getComputerWins() + 1);
+					if (!player2.isComputer())
+						player2.setHumanlosses(player2.getHumanlosses() + 1);
+					else
+						player2.setComputerLosses(player2.getComputerLosses() + 1);
+				} else {
+					if (!player2.isComputer())
+						player2.setHumanWins(player2.getHumanWins() + 1);
+					else
+						player2.setComputerWins(player2.getComputerWins() + 1);
+					if (!player1.isComputer())
+						player1.setHumanlosses(player1.getHumanlosses() + 1);
+					else
+						player1.setComputerLosses(player1.getComputerLosses() + 1);
+				}
+					
 				return true;
-		// check all columns
-		for (int y = 0; y < 3; y++)
-			if (board[0][y].getToken().equals(token)
-					&& board[1][y].getToken().equals(token)
-					&& board[2][y].getToken().equals(token))
-				return true;
-		// check diagonals
-		if (board[0][0].getToken().equals(token)
-				&& board[1][1].getToken().equals(token)
-				&& board[2][2].getToken().equals(token))
-			return true;
-		if (board[2][0].getToken().equals(token)
-				&& board[1][1].getToken().equals(token)
-				&& board[0][2].getToken().equals(token))
-			return true;
-		return false;
-		
+			}
+				
+		}
+			return false;		
 	}
 	
 	/**
@@ -420,7 +433,7 @@ public class TicTacToe extends Application {
 	 * initiate a move for them
 	 */
 	private void checkNextPlayer() {
-		if (whoseTurn.equals("Player 1")) {
+		if (global.getWhoseTurn().equals("Player 1")) {
 			if (player1.isComputer()) {
 				checkBoard(player1);
 				checkGameStatus();
@@ -441,22 +454,22 @@ public class TicTacToe extends Application {
 	 */
 	private void checkGameStatus() {
 		// Check game status
-		if (isWon(whoseTurn)) {
-			gameStatus.setText(whoseTurn + " won!  The game is over.");
-			whoseTurn = " ";
-			isPlayable = false;
+		if (isWon()) {
+			global.getGameStatus().setText(global.getWhoseTurn() + " won!  The game is over.");
+			global.setWhoseTurn(" ");
+			global.setPlayable(false);
 		}
 		else if (isFull()) {
-			gameStatus.setText("Draw! The game is over.");
-			isPlayable = false;
+			global.getGameStatus().setText("Draw! The game is over.");
+			global.setPlayable(false);
 		}
-		else if (isPlayable){
+		else if (global.isPlayable()){
 			// Change the turn
-			if (whoseTurn.equals("Player 1"))
-				whoseTurn = "Player 2";
+			if (global.getWhoseTurn().equals("Player 1"))
+				global.setWhoseTurn("Player 2");
 			else 
-				whoseTurn = "Player 1";
-			gameStatus .setText(whoseTurn + "'s turn.  Number of moves left are " + numberOfMovesLeft);
+				global.setWhoseTurn("Player 1");
+			global.getGameStatus().setText(global.getWhoseTurn() + "'s turn.  Number of moves left are " + global.getNumberOfMovesLeft());
 			checkNextPlayer();
 		}
 	}
@@ -467,10 +480,9 @@ public class TicTacToe extends Application {
 	 */
 	private void checkBoard(PlayerPane player) {
 		player.setBoardState(board);
-		player.setNumberOfMovesLeft(numberOfMovesLeft);
 		int[] computerMove = player.computerMove();
 		board[computerMove[0]][computerMove[1]].setToken(player.getToken());
-		numberOfMovesLeft--;
+		global.setNumberOfMovesLeft(global.getNumberOfMovesLeft() - 1);
 	}
 	
 	public static void main(String[] args) {
@@ -495,7 +507,7 @@ public class TicTacToe extends Application {
 			createCell();
 			this.setOnMouseClicked(e -> {
 				handleMouseClick();	
-				if (isPlayable)
+				if (global.isPlayable())
 					checkNextPlayer();
 			});
 		}
@@ -570,31 +582,31 @@ public class TicTacToe extends Application {
 		 */
 		private void handleMouseClick() {
 			//If the cell is empty and the game is not over
-			if (token.equals(" ") && !whoseTurn.equals(" ") && isPlayable) {
+			if (token.equals(" ") && !global.getWhoseTurn().equals(" ") && global.isPlayable()) {
 				// set token in the cell
-				if (whoseTurn.equals("Player 1"))
+				if (global.getWhoseTurn().equals("Player 1"))
 					setToken(player1.getToken());
 				else
 					setToken(player2.getToken());
-				numberOfMovesLeft--;
+				global.setNumberOfMovesLeft(global.getNumberOfMovesLeft() - 1);
 			}
 			// Check game status
-			if (isWon(whoseTurn)) {
-				gameStatus.setText(whoseTurn + " won!  The game is over.");
-				whoseTurn = " ";
-				isPlayable = false;
+			if (isWon()) {
+				global.getGameStatus().setText(global.getWhoseTurn() + " won!  The game is over.");
+				global.setWhoseTurn(" ");
+				global.setPlayable(false);
 			}
 			else if (isFull()) {
-				gameStatus.setText("Draw! The game is over.");
-				isPlayable = false;
+				global.getGameStatus().setText("Draw! The game is over.");
+				global.setPlayable(false);
 			}
-			else if (isPlayable){
+			else if (global.isPlayable()){
 				// Change the turn
-				if (whoseTurn.equals("Player 1"))
-					whoseTurn = "Player 2";
+				if (global.getWhoseTurn().equals("Player 1"))
+					global.setWhoseTurn("Player 2");
 				else 
-					whoseTurn = "Player 1";
-				gameStatus .setText(whoseTurn + "'s turn.  Number of moves left are " + numberOfMovesLeft);
+					global.setWhoseTurn("Player 1");
+				global.getGameStatus().setText(global.getWhoseTurn() + "'s turn.  Number of moves left are " + global.getNumberOfMovesLeft());
 			}
 		}
 

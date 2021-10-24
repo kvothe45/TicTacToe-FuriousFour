@@ -1,14 +1,11 @@
 package application;
 
-import java.awt.event.ActionEvent;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -18,19 +15,8 @@ import javafx.scene.text.Font;
 public class PlayerPane extends Player {
 
 	
-	/**
-	 * Constructor from Player superclass
-	 * @param token
-	 * @param isComputer
-	 */
-	public PlayerPane(Global global, String token, boolean isComputer) {
-		super(global, token, isComputer);
-	}
-
-	
 	private VBox sidePaneBox; // this is the side pane box for the player
-	private Image avatarImage; // This is the avatar selected for the given plaer
-	//private ImageView avatarImageView;// = new ImageView(); // this is the Imageview which will be displayed in the pane
+	private Image avatarImage; // This is the avatar selected for the given player
 	private int humanWins = 0; // number of human wins initially set to 0
 	private int humanlosses = 0; // number of human losses initially set to 0
 	private int computerWins = 0; // number of computer wins initially set to 0
@@ -41,8 +27,19 @@ public class PlayerPane extends Player {
 	private Label computerLossesLbl = new Label(); // display label computer losses
 	private Label overallWinsLbl = new Label(); // display label overall wins
 	private Label overallLossesLbl = new Label(); // display label overall losses
-	private HBox avatarSelectionMenu; // creating this as a global variable so i can change the visibility
+	private int player = 0;
 	
+	/**
+	 * Constructor from Player superclass
+	 * @param token
+	 * @param isComputer
+	 */
+	public PlayerPane(Global global, String token, boolean isComputer) {
+		super(global, token, isComputer);
+		if (!super.getToken().equals("X"))
+			player = 1;
+		createSidePane();
+	}
 	
 	/**
 	 * Override the parent classes setComputer method to change the visibility
@@ -52,11 +49,15 @@ public class PlayerPane extends Player {
 	@Override
 	public void setComputer(boolean isComputer) {
 		super.setComputer(isComputer);
-		if (super.isComputer()) {
-			avatarSelectionMenu.setVisible(false);
-			setComputerAvatarImage(super.getHardnessLevel());
-		} else {
-			avatarSelectionMenu.setVisible(true);
+		super.global.getAvatarSelectionBoxs()[player].setVisible(!isComputer);
+		if (!isComputer) {
+			String fileString;
+			if (player == 0)
+				fileString = "file:.\\resources\\player_avatars\\vampire_smiley.png";
+			else 
+				fileString = "file:.\\resources\\player_avatars\\ghost_skull.png";
+			avatarImage = new Image(fileString, 180, 180, true, true);
+			super.global.getPlayersAvatarImageView()[player].setImage(avatarImage);
 		}
 	}
 	
@@ -91,28 +92,23 @@ public class PlayerPane extends Player {
 				fileName = "file:.\\resources\\computer_avatars\\easy.jpg";
 		}
 		avatarImage = new Image(fileName, 180, 180, true, true);
-		updateAvatarImageView(avatarImage);
+		super.global.getPlayersAvatarImageView()[player].setImage(avatarImage);
 	}
 
-	public VBox createSidePane() {
-	
+	public void createSidePane() {
+
 		StackPane avatarPane = new StackPane(); // pane created to center the avatar
 		String fileString; 
-		if (super.getToken().equals("X")) 
-			fileString ="file:.\\resources\\player_avatars\\vampire_smiley.png"; 
+		if (player == 0)  
+			fileString ="file:.\\resources\\player_avatars\\vampire_smiley.png";
 		else 
-			fileString = "file:.\\resources\\player_avatars\\ghost_skull.png"; 
+			fileString = "file:.\\resources\\player_avatars\\ghost_skull.png";
 		avatarImage = new Image(fileString, 180, 180, true, true);
-		updateAvatarImageView(avatarImage);
-		//avatarImageView.setImage(avatarImage);
-		if (super.getToken().equals("X")) 
-			avatarPane.getChildren().add(super.global.getPlayer1AvatarImageView()); 
-		else 
-			avatarPane.getChildren().add(super.global.getPlayer2AvatarImageView());
-		//avatarPane.getChildren().add(avatarImageView);
-		avatarSelectionMenu = createAvatarChoiceBox(); // the selection for the avatar image
+		super.global.getPlayersAvatarImageView()[player].setImage(avatarImage);
+		avatarPane.getChildren().add(super.global.getPlayersAvatarImageView()[player]);
+		super.global.getAvatarSelectionBoxs()[player] = createAvatarChoiceBox(); 
 		Label playerLbl = new Label();
-		if (super.getToken().equals("X"))
+		if (player == 0)
 			playerLbl.setText("Player 1");
 		else 
 			playerLbl.setText("Player 2");
@@ -137,15 +133,11 @@ public class PlayerPane extends Player {
 		overallLossesLbl.setPadding(new Insets(5,0,5,5));
 		overallLossesLbl.setFont(Font.font(12));
 		
-		VBox sidePaneBox = new VBox();
-		sidePaneBox.setAlignment(Pos.CENTER);
-		sidePaneBox.getChildren().addAll(avatarPane, labelPane, avatarSelectionMenu,
+		
+		this.setAlignment(Pos.CENTER);
+		this.getChildren().addAll(avatarPane, labelPane, super.global.getAvatarSelectionBoxs()[player],
 				humanWinsLbl, humanLossesLbl, computerWinsLbl, computerLossesLbl, 
 				overallWinsLbl, overallLossesLbl);
-				
-		
-		this.sidePaneBox = sidePaneBox;
-		return sidePaneBox;
 	}
 	
 	/**
@@ -159,7 +151,7 @@ public class PlayerPane extends Player {
 				"Ghost Skull", "Goblin", "Maze Man", "Penguin", "Snowman", 
 				"Steampunk", "Sugar Skull", "Vampire Smiley", "Witch");
 		//Set the default value
-		if (super.getToken().equals("X"))
+		if (player == 0)
 			avatarChoices.setValue("Vamire Smiley");
 		else 
 			avatarChoices.setValue("Ghost Skull");		
@@ -220,15 +212,15 @@ public class PlayerPane extends Player {
 				fileString = "file:.\\resources\\player_avatars\\witch.jpg";
 				break;
 			default: 
-				if (super.getToken().equals("X"))
+				if (player == 0)
 					fileString = "file:.\\resources\\player_avatars\\vampire_smiley.png";
 				else 
-					fileString = "file:.\\resources\\player_avatars\\ghose_skull.png";
+					fileString = "file:.\\resources\\player_avatars\\ghost_skull.png";
 				
 		}
 
 		avatarImage = new Image(fileString, 180, 180, true, true);
-		updateAvatarImageView(avatarImage);
+		super.global.getPlayersAvatarImageView()[player].setImage(avatarImage);
 	}
 	
 /*--------------------------Getters / Setters and their helper methods   ---------------------------*/
@@ -348,12 +340,7 @@ public class PlayerPane extends Player {
 		overallLossesLbl.setText("Overall Losses: " + overallLossesString );
 	}
 	
-	private void updateAvatarImageView(Image avatarImage) {
-		if (super.getToken().equals("X")) 
-			super.global.getPlayer1AvatarImageView().setImage(avatarImage); 
-		else 
-			super.global.getPlayer2AvatarImageView().setImage(avatarImage);
-	}
+	
 
 	
 }

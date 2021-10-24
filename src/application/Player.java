@@ -1,19 +1,15 @@
 package application;
 
-
-import java.awt.event.ActionEvent;
 import java.util.Random;
-
 import application.TicTacToe.Cell;
-import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
 
-public class Player {
+public class Player extends VBox {
 	
 	private String token; // String to hold the token this player has
 	private boolean isComputer; // boolean to say whether this player is a computer or not
 	private String hardnessLevel; // if it is a computer, what level of hardness will he play at 
 	private Cell[][] boardState; // holds the current state of the board for the computer to use if necessary
-	private int numberOfMovesLeft = 9;
 	protected Global global;
 	
 	public Player (Global global,String token, boolean isComputer) {
@@ -40,7 +36,7 @@ public class Player {
 	public int[] easyPlay() {
 		int[] choice = {0,0};
 		Random random = new Random();
-		int computerMove = random.nextInt(numberOfMovesLeft);
+		int computerMove = random.nextInt(global.getNumberOfMovesLeft());
 		int count = 0;
 		for (int x = 0; x < 3; x++)
 			for (int y = 0; y < 3; y++) {
@@ -106,13 +102,6 @@ public class Player {
 	 */
 	public void setBoardState(Cell[][] boardState) {
 		this.boardState = boardState;
-	}
-	
-	/**
-	 * @param numberOfMovesLeft the numberOfMovesLeft to set
-	 */
-	public void setNumberOfMovesLeft(int numberOfMovesLeft) {
-		this.numberOfMovesLeft = numberOfMovesLeft;
 	}
 
 }
