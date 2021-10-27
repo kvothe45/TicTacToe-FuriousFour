@@ -8,6 +8,7 @@
 package application;
 
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -268,37 +269,40 @@ public class TicTacToe extends Application {
 	 */
 	private void actionChoice(ChoiceBox<String> backgroundChoices) {
 		String choice = backgroundChoices.getValue();
-		String fileString;
+		String fullFileName, fileName;		
 		switch (choice) {
 			case "Abstract Orange": 
-				fileString = "file:.\\resources\\backgrounds\\abstract_orange.jpg";
+				fileName = "abstract_orange.jpg";
 				break;
 			case "Blue Disco": 
-				fileString = "file:.\\resources\\backgrounds\\blue_disco.jpg";
+				fileName = "blue_disco.jpg";
 				break;
 			case "Flower": 
-				fileString = "file:.\\resources\\backgrounds\\flower.jpg";
+				fileName = "flower.jpg";
 				break;
 			case "Green Frosted Glass": 
-				fileString = "file:.\\resources\\backgrounds\\green_frosted_glass.jpg";
+				fileName = "green_frosted_glass.jpg";
 				break;
 			case "Pink Wind": 
-				fileString = "file:.\\resources\\backgrounds\\pink_wind.jpg";
+				fileName = "pink_wind.jpg";
 				break;
 			case "Sand Blur": 
-				fileString = "file:.\\resources\\backgrounds\\sand_blur.jpg";
+				fileName = "sand_blur.jpg";
 				break;
 			case "Simple Blue": 
-				fileString = "file:.\\resources\\backgrounds\\blue_simple.jpg";
+				fileName = "blue_simple.jpg";
 				break;
 			case "Simple Green": 
-				fileString = "file:.\\resources\\backgrounds\\green_simple.jpg";
+				fileName = "green_simple.jpg";
 				break;
-			case "White": fileString = "file:.\\resources\\white.png";
+			case "White": fileName = "white.png";
 				break;
-			default: fileString = "file:.\\resources\\white.png";
+			default: fileName = "white.png";
 		}
-		Image backgroundImage = new Image(fileString, 1100, 740, false, true);
+		fullFileName = "file:" + System.getProperty("user.dir") + 
+				File.separator + "resources" + File.separator + 
+				"backgrounds" + File.separator + fileName;
+		Image backgroundImage = new Image(fullFileName, 1100, 740, false, true);
 		backgroundImageView.setImage(backgroundImage);
 	}
 	
@@ -848,10 +852,15 @@ public class TicTacToe extends Application {
 			this.token = token;
 			this.isComputer = isComputer;
 			this.hardnessLevel = "easy";
+			String fullFileName, fileName = "";
 			if (token.equals("X"))
-				tokenImage = new Image("file:.\\resources\\tokens\\x.png", 150, 150, true, true);
+				fileName = "x.png";
 			else
-				tokenImage = new Image("file:.\\resources\\tokens\\o.png", 150, 150, true, true);
+				fileName = "o.png";
+			fullFileName = "file:" + System.getProperty("user.dir") + 
+					File.separator + "resources" + File.separator + 
+					"tokens" + File.separator + fileName;
+			tokenImage = new Image(fullFileName, 150, 150, true, true);
 		}
 		
 		public int[] computerMove() {
@@ -982,10 +991,8 @@ public class TicTacToe extends Application {
 				for (int x = 0; x < 3; x++) {
 					for (int y = 0; y < 3; y ++) {
 						if (board[x][y].getToken().equals(" ")) {
-							//board[x][y].setToken("X");
 							board[x][y].setTokenValue("X");
 							int score = minMax(minimum, maximum, false);
-							//board[x][y].setToken(" ");
 							board[x][y].setTokenValue(" ");
 							bestScore = Math.max(score, bestScore);
 							if (maximum <= bestScore) // this keeps it from going on when it's found as good of a result as it's going to find
@@ -998,10 +1005,8 @@ public class TicTacToe extends Application {
 				for (int x = 0; x < 3; x++) {
 					for (int y = 0; y < 3; y ++) {
 						if (board[x][y].getToken().equals(" ")) {
-							//board[x][y].setToken("O");
 							board[x][y].setTokenValue("O");
 							int score = minMax(minimum, maximum, true);
-							//board[x][y].setToken(" ");
 							board[x][y].setTokenValue(" ");
 							bestScore = Math.min(score, bestScore);
 							if (bestScore <= minimum) // this keeps it from going on when it's found as good of a result as it's going to find
@@ -1078,17 +1083,22 @@ public class TicTacToe extends Application {
 		 * @param imageType
 		 */
 		public void changeTokenImage(String imageType) {
+			String fullFileName, fileName = "";
 			if (token.equals("X")) {
 				if (imageType.equals("Primary"))
-					tokenImage = new Image("file:.\\resources\\tokens\\x.png", 150, 150, true, true);
-				else
-					tokenImage = new Image("file:.\\resources\\tokens\\cat.png", 150, 150, true, true);
+					fileName = "x.png";					
+				else 
+					fileName = "cat.png";
 			} else {
 				if (imageType.equals("Primary"))
-					tokenImage = new Image("file:.\\resources\\tokens\\o.png", 150, 150, true, true);
+					fileName = "o.png";
 				else
-					tokenImage = new Image("file:.\\resources\\tokens\\dog.png", 150, 150, true, true);
+					fileName = "dog.png";
 			}
+			fullFileName = "file:" + System.getProperty("user.dir") + 
+					File.separator + "resources" + File.separator + 
+					"tokens" + File.separator + fileName;
+			tokenImage = new Image(fullFileName, 150, 150, true, true);
 			
 		}
 
@@ -1140,12 +1150,15 @@ public class TicTacToe extends Application {
 			super.setComputer(isComputer);
 			avatarSelectionBoxs[player].setVisible(!isComputer);
 			if (!isComputer) {
-				String fileString;
+				String fullFileName, fileName = "";
 				if (player == 0)
-					fileString = "file:.\\resources\\player_avatars\\vampire_smiley.png";
+					fileName = "vampire_smiley.png";
 				else 
-					fileString = "file:.\\resources\\player_avatars\\ghost_skull.png";
-				avatarImage = new Image(fileString, 180, 180, true, true);
+					fileName = "ghost_skull.png";
+				fullFileName = "file:" + System.getProperty("user.dir") + 
+						File.separator + "resources" + File.separator + 
+						"player_avatars" + File.separator + fileName;
+				avatarImage = new Image(fullFileName, 180, 180, true, true);
 				playersAvatarImageView[player].setImage(avatarImage);
 			}
 		}
@@ -1166,21 +1179,24 @@ public class TicTacToe extends Application {
 		 * @param hardnessLevel
 		 */
 		private void setComputerAvatarImage(String hardnessLevel) {
-			String fileName;
+			String fullFileName, fileName = "";
 			switch (hardnessLevel) {
-				case "easy":
-					fileName = "file:.\\resources\\computer_avatars\\easy.jpg";
+				case "easy":					 
+					fileName = "easy.jpg";
 					break;
 				case "medium":
-					fileName = "file:.\\resources\\computer_avatars\\medium.png";
+					fileName = "medium.png";
 					break;
 				case "hard":
-					fileName = "file:.\\resources\\computer_avatars\\hard.png";
+					fileName = "hard.png";
 					break;
 				default:
-					fileName = "file:.\\resources\\computer_avatars\\easy.jpg";
+					fileName = "easy.jpg";
 			}
-			avatarImage = new Image(fileName, 180, 180, true, true);
+			fullFileName = "file:" + System.getProperty("user.dir") + 
+					File.separator + "resources" + File.separator + 
+					"computer_avatars" + File.separator + fileName;
+			avatarImage = new Image(fullFileName, 180, 180, true, true);
 			playersAvatarImageView[player].setImage(avatarImage);
 		}
 
@@ -1191,12 +1207,15 @@ public class TicTacToe extends Application {
 		public void createSidePane() {
 
 			StackPane avatarPane = new StackPane(); // pane created to center the avatar
-			String fileString; 
+			String fullFileName, fileName = ""; 
 			if (player == 0)  
-				fileString ="file:.\\resources\\player_avatars\\vampire_smiley.png";
+				fileName ="vampire_smiley.png";
 			else 
-				fileString = "file:.\\resources\\player_avatars\\ghost_skull.png";
-			avatarImage = new Image(fileString, 180, 180, true, true);
+				fileName = "ghost_skull.png";
+			fullFileName = "file:" + System.getProperty("user.dir") + 
+					File.separator + "resources" + File.separator + 
+					"player_avatars" + File.separator + fileName;
+			avatarImage = new Image(fullFileName, 180, 180, true, true);
 			playersAvatarImageView[player].setImage(avatarImage);
 			avatarPane.getChildren().add(playersAvatarImageView[player]);
 			avatarSelectionBoxs[player] = createAvatarChoiceBox(); 
@@ -1253,53 +1272,55 @@ public class TicTacToe extends Application {
 		 */
 		private void avatarActionChoice(ChoiceBox<String> avatarChoices) {
 			String choice = avatarChoices.getValue();
-			String fileString;
+			String fullFileName, fileName = "";
 			switch (choice) {
 				case "Anime Man": 
-					fileString = "file:.\\resources\\player_avatars\\anime_man.png";
+					fileName = "anime_man.png";
 					break;
 				case "Archer": 
-					fileString = "file:.\\resources\\player_avatars\\archer.png";
+					fileName = "archer.png";
 					break;
 				case "Bunny": 
-					fileString = "file:.\\resources\\player_avatars\\bunny.png";
+					fileName = "bunny.png";
 					break;
 				case "Ghost Skull": 
-					fileString = "file:.\\resources\\player_avatars\\ghost_skull.png";
+					fileName = "ghost_skull.png";
 					break;
 				case "Goblin": 
-					fileString = "file:.\\resources\\player_avatars\\goblin.png";
+					fileName = "goblin.png";
 					break;
 				case "Maze Man": 
-					fileString = "file:.\\resources\\player_avatars\\maze_man.png";
+					fileName = "maze_man.png";
 					break;
 				case "Penguin": 
-					fileString = "file:.\\resources\\player_avatars\\penguin.png";
+					fileName = "penguin.png";
 					break;
 				case "Snowman": 
-					fileString = "file:.\\resources\\player_avatars\\snowman.png";
+					fileName = "snowman.png";
 					break;
 				case "Steampunk": 
-					fileString = "file:.\\resources\\player_avatars\\steampunk_woman.png";
+					fileName = "steampunk_woman.png";
 					break;
 				case "Sugar Skull": 
-					fileString = "file:.\\resources\\player_avatars\\sugar_skull.png";
+					fileName = "sugar_skull.png";
 					break;
 				case "Vampire Smiley": 
-					fileString = "file:.\\resources\\player_avatars\\vampire_smiley.png";
+					fileName = "vampire_smiley.png";
 					break;
 				case "Witch": 
-					fileString = "file:.\\resources\\player_avatars\\witch.jpg";
+					fileName = "witch.jpg";
 					break;
 				default: 
 					if (player == 0)
-						fileString = "file:.\\resources\\player_avatars\\vampire_smiley.png";
+						fileName = "vampire_smiley.png";
 					else 
-						fileString = "file:.\\resources\\player_avatars\\ghost_skull.png";
+						fileName = "ghost_skull.png";
 					
 			}
-
-			avatarImage = new Image(fileString, 180, 180, true, true);
+			fullFileName = "file:" + System.getProperty("user.dir") + 
+					File.separator + "resources" + File.separator + 
+					"player_avatars" + File.separator + fileName;
+			avatarImage = new Image(fullFileName, 180, 180, true, true);
 			playersAvatarImageView[player].setImage(avatarImage);
 		}
 		
