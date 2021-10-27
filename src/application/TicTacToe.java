@@ -70,7 +70,7 @@ public class TicTacToe extends Application {
 		player2 = new PlayerPane("O", false);
 		
 		StackPane visibleLayers = createGameLayers(); // This has all the visible layers for the game
-		Scene scene = new Scene(visibleLayers, 1050, 740); //Create a scene and place it in the stage
+		Scene scene = new Scene(visibleLayers); //Create a scene and place it in the stage
 		
 		primaryStage.setTitle("TicTacToe");
 		primaryStage.setScene(scene);
@@ -852,6 +852,9 @@ public class TicTacToe extends Application {
 			this.token = token;
 			this.isComputer = isComputer;
 			this.hardnessLevel = "easy";
+			this.setPadding(new Insets(0,5,0,5));
+			this.setAlignment(Pos.CENTER);
+			this.setWidth(425);
 			String fullFileName, fileName = "";
 			if (token.equals("X"))
 				fileName = "x.png";
@@ -1232,11 +1235,11 @@ public class TicTacToe extends Application {
 				updateWinsLosses(i);
 			}		
 			
-			this.setAlignment(Pos.CENTER);
 			this.getChildren().addAll(avatarPane, labelPane, avatarSelectionBoxs[player]);
 			for(int i = 0; i < 6; i++) {
 				this.getChildren().add(playerStatusLabels[i]);
 			}
+			
 		}
 		
 		/**
