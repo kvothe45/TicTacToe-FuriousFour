@@ -69,7 +69,7 @@ public class TicTacToe extends Application {
 		player2 = new PlayerPane("O", false);
 		
 		StackPane visibleLayers = createGameLayers(); // This has all the visible layers for the game
-		Scene scene = new Scene(visibleLayers, 1025, 740); //Create a scene and place it in the stage
+		Scene scene = new Scene(visibleLayers, 1050, 740); //Create a scene and place it in the stage
 		
 		primaryStage.setTitle("TicTacToe");
 		primaryStage.setScene(scene);
@@ -104,7 +104,7 @@ public class TicTacToe extends Application {
 
 		// creates and populates the top border pane
 		StackPane topPane  = new StackPane(); //The top stackpane will hold all the menu items
-		Rectangle topRectangle = rectangleCreator(1025,100); // this rectangle will define the area
+		Rectangle topRectangle = rectangleCreator(1050,100); // this rectangle will define the area
 		topPane.getChildren().add(topRectangle);
 		VBox menuRowsVBox = createMenus();
 		topPane.getChildren().add(menuRowsVBox );
@@ -161,7 +161,7 @@ public class TicTacToe extends Application {
 		HBox menuRow2HBox = new HBox();
 		
 		numberOfDrawsLabel.setText("Number of Draws: " + String.valueOf(numberOfDraws));
-		numberOfDrawsLabel.setPadding(new Insets(0,0,0,5));
+		numberOfDrawsLabel.setPadding(new Insets(0,0,0,10));
 		Button newGameButton = new Button("New Game");
 		newGameButton.setOnMouseClicked(e -> {
 			newGame();
@@ -254,7 +254,7 @@ public class TicTacToe extends Application {
 		backgroundSwitchButton.setOnAction(e -> actionChoice(backgroundChoices));
 		
 		HBox backgroundChoiceBox = new HBox();
-		backgroundChoiceBox.setPadding(new Insets(0,0,0,5));
+		backgroundChoiceBox.setPadding(new Insets(0,0,0,10));
 		backgroundChoiceBox.setSpacing(5);
 		backgroundChoiceBox.getChildren().addAll(backgroundChoices, backgroundSwitchButton);
 		return backgroundChoiceBox;
