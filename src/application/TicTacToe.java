@@ -12,6 +12,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
 
+import javafx.animation.RotateTransition;
+import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -33,6 +35,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 
 public class TicTacToe extends Application {
@@ -52,6 +55,8 @@ public class TicTacToe extends Application {
 	private ImageView playersAvatarImageView[] = new ImageView[2]; // this is the ImageViews for the player avatars placed here to allow the image to be changed programattically
 	private HBox[] avatarSelectionBoxs = new HBox[2]; // this is the avatar choice box set here to allow for altering the visibility
 	private ArrayList<Combinations> winningCombinations = new ArrayList<>(); // this is the list of all possible winning combinations
+	private int winningArrayElement; // will store the winning array element for the computer's move
+	private boolean[] playerMoved = new boolean[2]; // stores whether the player has been moved or not
 	
 	
 
@@ -66,7 +71,7 @@ public class TicTacToe extends Application {
 			playerTokenImageView[i]= new ImageView(); 
 		}
 		
-		player1 = new PlayerPane("X", false);
+		player1 = new PlayerPane("X", false);		
 		player2 = new PlayerPane("O", false);
 		
 		StackPane visibleLayers = createGameLayers(); // This has all the visible layers for the game
@@ -76,7 +81,6 @@ public class TicTacToe extends Application {
 		primaryStage.setScene(scene);
 		primaryStage.setResizable(false);
 		primaryStage.show();
-		
 	}
 	
 	/**
@@ -330,7 +334,6 @@ public class TicTacToe extends Application {
 		twoHumans.setSelected(true);
 		
 		noHumans.setOnAction(e -> {
-			clearBoard();
 			if (player2.isComputer()) {
 				player1.setHardnessLevel(player2.getHardnessLevel());
 				player1.setComputer(true);
@@ -341,13 +344,11 @@ public class TicTacToe extends Application {
 				player1.setComputer(true);
 				player2.setComputer(true);
 			}
-			numberOfMovesLeft = 9;
-			checkNextPlayer();
+			newGame();
 			difficultyLevelRadioBox.setVisible(true);
 				
 		}); 
 		oneHuman.setOnAction(e -> {
-			clearBoard();
 			if (player2.isComputer()) {
 				player2.setHardnessLevel(player2.getHardnessLevel());
 				player1.setComputer(false);
@@ -356,15 +357,14 @@ public class TicTacToe extends Application {
 				player2.setComputer(true);
 				((RadioButton) difficultyLevelRadioBox.getChildren().get(1)).setSelected(true);
 			}
-			numberOfMovesLeft = 9;
+			newGame();
 			difficultyLevelRadioBox.setVisible(true);
 			
 		});
 		twoHumans.setOnAction(e -> {
-			clearBoard();
 			player1.setComputer(false);
 			player2.setComputer(false);
-			numberOfMovesLeft = 9;
+			newGame();
 			difficultyLevelRadioBox.setVisible(false);
 			((RadioButton) difficultyLevelRadioBox.getChildren().get(1)).setSelected(true);
 		});
@@ -398,24 +398,15 @@ public class TicTacToe extends Application {
 		
 		easyButton.setOnAction(e -> {
 			updateHardnessLevel(easyButton.getText());
-			clearBoard();
-			numberOfMovesLeft = 9;
-			if (player1.isComputer())
-				checkNextPlayer();			
+			newGame();			
 		});
 		mediumButton.setOnAction(e -> {
 			updateHardnessLevel(mediumButton.getText());
-			clearBoard();
-			numberOfMovesLeft = 9;
-			if (player1.isComputer())
-				checkNextPlayer();			
+			newGame();			
 		});
 		hardButton.setOnAction(e -> {
 			updateHardnessLevel(hardButton.getText());
-			clearBoard();
-			numberOfMovesLeft = 9;
-			if (player1.isComputer())
-				checkNextPlayer();			
+			newGame();			
 		});
 		
 		Text difficultyLevelText = new Text("Difficulty Level: ");
@@ -492,6 +483,7 @@ public class TicTacToe extends Application {
 				board[x][y].setToken(" ");
 		isPlayable = true;
 		whoseTurn = "Player 1";
+		resetPlayerPaneTransition();
 	}
 	
 	/**
@@ -503,6 +495,8 @@ public class TicTacToe extends Application {
 			for (int y = 0; y < 3; y++)
 				if (board[x][y].getToken().equals(" "))
 					return false;
+		playerPaneTransition((byte) 0);
+		playerPaneTransition((byte) 1);
 		return true;
 	}
 	
@@ -533,19 +527,87 @@ public class TicTacToe extends Application {
 	 * @param args
 	 */
 	public boolean isWon() {
-		for (Combinations winningCombo: winningCombinations) {
-			if (winningCombo.isGameWon()) {
+		for (int i = 0; i < 8; i++) {
+			if (winningCombinations.get(i).isGameWon()) {
 				if (whoseTurn.equals("Player 1")) {
 					setWinningStats("Player 1");
+					playerPaneTransition((byte) 1);
 				} else {
 					setWinningStats("Player 2");
+					playerPaneTransition((byte) 0);
 				}
-					
+				winningArrayElement = i;
+				rotateWinningCells();
 				return true;
 			}
 				
 		}
 			return false;		
+	}
+	
+	
+	/**
+	 * This method is here to rotate the winning cells
+	 * @param cells
+	 */
+	private void rotateWinningCells() {
+		RotateTransition pane1Transition = new RotateTransition(Duration.seconds(2), winningCombinations.get(winningArrayElement).cells[0]);
+		pane1Transition.setByAngle(360);
+		pane1Transition.setRate(2);
+		pane1Transition.setCycleCount(2);
+		pane1Transition.play();
+		RotateTransition pane2Transition = new RotateTransition(Duration.seconds(2), winningCombinations.get(winningArrayElement).cells[1]);
+		pane2Transition.setByAngle(360);
+		pane2Transition.setRate(2);
+		pane2Transition.setCycleCount(2);
+		pane2Transition.play();	
+		RotateTransition pane3Transition = new RotateTransition(Duration.seconds(2), winningCombinations.get(winningArrayElement).cells[2]);
+		pane3Transition.setByAngle(360);
+		pane3Transition.setRate(2);
+		pane3Transition.setCycleCount(2);
+		pane3Transition.play();	
+	}
+	
+	
+	/**
+	 * moves the player pane to the left or right when they loose or draw
+	 * @param player
+	 */
+	private void playerPaneTransition(byte player) {
+		if (player == 0) {
+			TranslateTransition playerTransition = new TranslateTransition(Duration.seconds(2), player1);
+			playerTransition.setToX(-300 + player1.getLayoutX());
+			playerTransition.setCycleCount(1);
+			playerTransition.play();
+			playerMoved[0] = true;
+		} else {
+			TranslateTransition playerTransition = new TranslateTransition(Duration.seconds(2), player2);
+			playerTransition.setToX(300 + player2.getLayoutX());
+			playerTransition.setCycleCount(1);
+			playerTransition.play();
+			playerMoved[1] = true;
+		}
+	}
+	
+	/**
+	 * checks if the player panes have been moved from their original position.  
+	 * if they have, then reset them by the factor they were moved from
+	 */
+	private void resetPlayerPaneTransition() {
+		if (playerMoved[0]) {
+			TranslateTransition playerTransition = new TranslateTransition(Duration.seconds(1), player1);
+			playerTransition.setToX(player1.getLayoutX());
+			playerTransition.setCycleCount(1);
+			playerTransition.play();
+			playerMoved[0] = false;
+		}
+		if (playerMoved[1]) {
+			TranslateTransition playerTransition = new TranslateTransition(Duration.seconds(1), player2);
+			playerTransition.setToX(player2.getLayoutX());
+			playerTransition.setCycleCount(1);
+			playerTransition.play();
+			playerMoved[1] = false;
+		}
 	}
 	
 	/**
@@ -589,9 +651,11 @@ public class TicTacToe extends Application {
 		switch(gameState()) {
 		case 1:
 			playerWon("Player 1");
+			playerPaneTransition((byte) 1);
 			break;
 		case -1:
 			playerWon("Player 2");
+			playerPaneTransition((byte) 0);
 			break;
 		case 0:
 			gameStatus.setText("Draw! The game is over.");
@@ -646,9 +710,12 @@ public class TicTacToe extends Application {
 	 * @param args
 	 */
 	private String whoWon() {
-		for (Combinations winningCombo: winningCombinations) {
-			if (winningCombo.isGameWon())
-				return winningCombo.getCells()[0].getToken();
+		for (int i = 0; i < 8; i++) {
+			if (winningCombinations.get(i).isGameWon()) {
+				winningArrayElement = i;
+				rotateWinningCells();
+				return winningCombinations.get(i).getCells()[0].getToken();
+			}
 		}
 		return " ";		
 	}
@@ -1239,7 +1306,6 @@ public class TicTacToe extends Application {
 			for(int i = 0; i < 6; i++) {
 				this.getChildren().add(playerStatusLabels[i]);
 			}
-			
 		}
 		
 		/**
