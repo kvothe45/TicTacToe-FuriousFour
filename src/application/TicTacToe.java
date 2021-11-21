@@ -379,14 +379,19 @@ public class TicTacToe extends Application {
 		return numberOfPlayersBox;
 	}
 	
+	/**
+	 * This creates the section of the menu that deals with game
+	 * difficulty against a computer
+	 * @return
+	 */
 	private HBox createDifficultySelectionBox() {
 		
-		RadioButton easyButton, mediumButton, hardButton;
+		RadioButton easyButton, mediumButton, hardButton; // the radio buttons that will be the difficulty selection
 		easyButton = new RadioButton("easy");
 		mediumButton = new RadioButton("medium");
 		hardButton = new RadioButton("hard");
 		
-		ToggleGroup difficultyLevelGroup = new ToggleGroup();
+		ToggleGroup difficultyLevelGroup = new ToggleGroup(); // the ToggleGroup to group the radio buttons together
 		easyButton.setToggleGroup(difficultyLevelGroup);
 		mediumButton.setToggleGroup(difficultyLevelGroup);
 		hardButton.setToggleGroup(difficultyLevelGroup);
@@ -409,9 +414,9 @@ public class TicTacToe extends Application {
 			newGame();			
 		});
 		
-		Text difficultyLevelText = new Text("Difficulty Level: ");
+		Text difficultyLevelText = new Text("Difficulty Level: ");//  display text to let people know what the radio buttons are for
 		difficultyLevelText.setFont(Font.font(12));
-		HBox difficultyLevelBox = new HBox();
+		HBox difficultyLevelBox = new HBox(); // the HBox to hold all the difficulty components together
 		difficultyLevelBox.setPadding(new Insets(5, 0, 0, 20));
 		difficultyLevelBox.setSpacing(5);
 		difficultyLevelBox.getChildren().addAll(difficultyLevelText, easyButton, 
@@ -419,6 +424,10 @@ public class TicTacToe extends Application {
 		return difficultyLevelBox;
 	}
 	
+	/**
+	 * This method is used to update the difficulty level for the computer player(s)
+	 * @param hardnessLevel
+	 */
 	private void updateHardnessLevel(String hardnessLevel) {
 		if (player1.isComputer()) {
 			player1.setHardnessLevel(hardnessLevel);
@@ -470,13 +479,16 @@ public class TicTacToe extends Application {
 	 * @return
 	 */
 	public Rectangle rectangleCreator(int xDimension, int yDimension) {
-		Rectangle rectangle = new Rectangle(xDimension, yDimension);
+		Rectangle rectangle = new Rectangle(xDimension, yDimension); // Rectangle variable to return
 		rectangle.setFill(null);
 		rectangle.setStroke(Color.BLACK);
 
 		return rectangle;
 	}
 	
+	/**
+	 * Method to clear all tokens from the board
+	 */
 	private void clearBoard() {
 		for (int x = 0; x < 3; x++)
 			for(int y = 0; y < 3; y++)
@@ -500,6 +512,10 @@ public class TicTacToe extends Application {
 		return true;
 	}
 	
+	/**
+	 * updated the wins/losses stats for the players
+	 * @param player
+	 */
 	private void setWinningStats(String player) {
 		if (player.equals("Player 1")) {
 			if (!player1.isComputer())
@@ -933,6 +949,11 @@ public class TicTacToe extends Application {
 			tokenImage = new Image(fullFileName, 150, 150, true, true);
 		}
 		
+		/**
+		 * This method handles how to play the computer's move based on the difficulty
+		 * selected
+		 * @return
+		 */
 		public int[] computerMove() {
 			int[] choice = {0,0}; //x and y coordinates for the computer's move
 			switch(hardnessLevel) {
@@ -1470,7 +1491,11 @@ public class TicTacToe extends Application {
 	 */
 	public class Combinations {
 		
-		private Cell[] cells;
+		private Cell[] cells; // array of winning combinations of cells
+		
+		public Combinations(Cell... cells) {
+			this.cells = cells;
+		}
 		
 		/**
 		 * @return the cells
@@ -1478,17 +1503,21 @@ public class TicTacToe extends Application {
 		public Cell[] getCells() {
 			return cells;
 		}
-
-		public Combinations(Cell... cells) {
-			this.cells = cells;
-		}
-		
+	
+		/**
+		 * checks to see if there is a a row of all 
+		 * @return
+		 */
 		public boolean isGameWon() {
 			if (cells[0].getToken().equals(" "))
 				return false;
 			return cells[0].getToken().equals(cells[1].getToken()) && cells[0].getToken().equals(cells[2].getToken());
 		}
 		
+		/**
+		 * creates the winning combinations
+		 * @return
+		 */
 		public int[] consecutiveCellsFilled() {
 			int[] coordiantes = {3,3};
 			if (!(cells[0].getToken().equals(" ") && cells[1].getToken().equals(" ") && cells[2].getToken().equals(" "))) {
